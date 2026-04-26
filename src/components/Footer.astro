@@ -1,0 +1,78 @@
+---
+const year = new Date().getFullYear();
+---
+<footer>
+  <div class="footer-logo"><span class="accent">sub3</span> engineering</div>
+  <div class="footer-pace">
+    <span id="footerTimer">00:00:00</span>
+    page load pace
+  </div>
+  <div class="footer-copy">
+    © {year} sub3 engineering<br />
+    Keep Running
+  </div>
+</footer>
+
+<script>
+  const timerEl = document.getElementById('footerTimer');
+  let elapsed = 0;
+  function fmt(s: number): string {
+    const h = String(Math.floor(s / 3600)).padStart(2, '0');
+    const m = String(Math.floor((s % 3600) / 60)).padStart(2, '0');
+    const sc = String(s % 60).padStart(2, '0');
+    return `${h}:${m}:${sc}`;
+  }
+  setInterval(() => {
+    elapsed++;
+    if (timerEl) timerEl.textContent = fmt(elapsed);
+  }, 1000);
+</script>
+
+<style>
+  footer {
+    padding: 3.5rem 3.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-logo {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 1.4rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .footer-logo .accent { color: var(--accent); }
+  .footer-pace {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--text-ghost);
+    text-align: center;
+  }
+  .footer-pace span {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+  .footer-copy {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    color: var(--text-ghost);
+    text-align: right;
+  }
+  @media (max-width: 900px) {
+    footer {
+      flex-direction: column;
+      gap: 1.5rem;
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+    }
+    .footer-copy { text-align: center; }
+  }
+</style>
