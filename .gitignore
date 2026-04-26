@@ -1,7 +1,14 @@
-_site
-.sass-cache
-.jekyll-cache
-.jekyll-metadata
-vendor
+# Astro build output
+dist/
+
+# Astro cache
+.astro/
+
+# Dependencies
+node_modules/
+
+# macOS
 .DS_Store
-.vscode
+
+# IDE
+.vscode/
