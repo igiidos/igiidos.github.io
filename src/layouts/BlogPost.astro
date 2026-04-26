@@ -1,0 +1,174 @@
+---
+import Base from './Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'posts'>;
+  prevPost: CollectionEntry<'posts'> | null;
+  nextPost: CollectionEntry<'posts'> | null;
+}
+
+const { post, prevPost, nextPost } = Astro.props;
+const { title, date, category, tags } = post.data;
+
+function formatDate(d: Date): string {
+  return d.toISOString().slice(0, 10).replace(/-/g, '.');
+}
+---
+<Base title={`${title} — sub3 engineering`}>
+  <Nav />
+  <main class="post-main">
+    <header class="post-header">
+      <div class="post-meta">
+        <span class="post-date">{formatDate(date)}</span>
+        <a href={`/${category}`} class="post-cat">{category}</a>
+      </div>
+      <h1 class="post-title">{title}</h1>
+      {tags && tags.length > 0 && (
+        <div class="post-tags">
+          {tags.map(tag => <span class="post-tag-item">#{tag}</span>)}
+        </div>
+      )}
+    </header>
+
+    <article class="post-content">
+      <slot />
+    </article>
+
+    <nav class="post-nav">
+      {prevPost && (
+        <a href={`/posts/${prevPost.slug}`} class="post-nav-link post-nav-prev">
+          <span class="post-nav-label">← 이전 글</span>
+          <span class="post-nav-title">{prevPost.data.title}</span>
+        </a>
+      )}
+      {nextPost && (
+        <a href={`/posts/${nextPost.slug}`} class="post-nav-link post-nav-next">
+          <span class="post-nav-label">다음 글 →</span>
+          <span class="post-nav-title">{nextPost.data.title}</span>
+        </a>
+      )}
+    </nav>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .post-main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 8rem 2rem 6rem;
+  }
+  .post-header {
+    margin-bottom: 4rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .post-meta { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+  .post-date { font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.15em; color: var(--text-muted); }
+  .post-cat {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 0.15rem 0.55rem;
+    border: 1px solid rgba(212,255,0,0.15);
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .post-cat:hover { background: var(--accent-mid); }
+  .post-title {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 0.95;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+  }
+  .post-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .post-tag-item { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; color: var(--text-muted); }
+
+  /* Markdown content styles */
+  .post-content {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text);
+  }
+  .post-content :global(h2) {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 1.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text);
+    margin: 3rem 0 1rem;
+  }
+  .post-content :global(h3) {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1.3rem;
+    text-transform: uppercase;
+    color: var(--text);
+    margin: 2rem 0 0.75rem;
+  }
+  .post-content :global(p) { margin-bottom: 1.5rem; }
+  .post-content :global(a) { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+  .post-content :global(ul),
+  .post-content :global(ol) { padding-left: 1.5rem; margin-bottom: 1.5rem; }
+  .post-content :global(li) { margin-bottom: 0.5rem; }
+  .post-content :global(code) {
+    font-family: var(--mono);
+    font-size: 0.875em;
+    background: var(--bg-card);
+    padding: 0.1em 0.4em;
+    border: 1px solid var(--border);
+  }
+  .post-content :global(pre) {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+  }
+  .post-content :global(pre code) { background: none; border: none; padding: 0; }
+  .post-content :global(blockquote) {
+    border-left: 3px solid var(--accent);
+    padding-left: 1.5rem;
+    margin: 2rem 0;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+  .post-content :global(hr) { border: none; border-top: 1px solid var(--border); margin: 3rem 0; }
+
+  /* Prev/Next navigation */
+  .post-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    margin-top: 5rem;
+    border-top: 1px solid var(--border);
+  }
+  .post-nav-link {
+    background: var(--bg);
+    padding: 2rem;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: background 0.2s;
+  }
+  .post-nav-link:hover { background: var(--bg-hover); }
+  .post-nav-next { text-align: right; }
+  .post-nav-label { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); }
+  .post-nav-title { font-family: var(--display); font-weight: 700; font-size: 1.1rem; color: var(--text); transition: color 0.2s; }
+  .post-nav-link:hover .post-nav-title { color: var(--accent); }
+</style>
