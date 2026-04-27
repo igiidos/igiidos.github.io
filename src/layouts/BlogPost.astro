@@ -11,13 +11,49 @@ interface Props {
 }
 
 const { post, prevPost, nextPost } = Astro.props;
-const { title, date, category, tags } = post.data;
+const { title, date, category, tags, excerpt, image, ogshot } = post.data;
 
 function formatDate(d: Date): string {
   return d.toISOString().slice(0, 10).replace(/-/g, '.');
 }
+
+const OGSHOT_BASE = 'https://og.planhub.kr/v1/og';
+// TODO: replace with real OGshot API key (consider moving to env var before production)
+const OGSHOT_KEY = 'ogshot_sk_a3f8b2c1d4e7f9a6';
+
+function buildOgshotURL(title: string, category: string): string {
+  const params = new URLSearchParams({
+    key: OGSHOT_KEY,
+    title,
+    subtitle: category.toUpperCase(),
+    theme: 'dark',
+    accent: 'D4FF00',
+  });
+  return `${OGSHOT_BASE}?${params}`;
+}
+
+// OG 이미지 cascade:
+//   1) frontmatter ogshot URL (직접 지정한 OGshot 링크)
+//   2) frontmatter image (정적 파일 또는 외부 URL)
+//   3) 자동 생성 OGshot URL (제목 + 카테고리)
+function resolveOgImage(
+  ogshot: string | undefined,
+  image: string | undefined,
+  title: string,
+  category: string,
+): string {
+  return ogshot ?? image ?? buildOgshotURL(title, category);
+}
+
+const ogImage = resolveOgImage(ogshot, image, title, category);
+const ogDescription = excerpt ?? `${category} — ${title}`;
 ---
-<Base title={`${title} — sub3 engineering`}>
+<Base
+  title={`${title} — sub3 engineering`}
+  description={ogDescription}
+  image={ogImage}
+  type="article"
+>
   <Nav />
   <main class="post-main">
     <header class="post-header">
